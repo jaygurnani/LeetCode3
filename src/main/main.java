@@ -54,7 +54,7 @@ public class main {
         int second = Integer.MAX_VALUE;
 
         for(int num: nums) {
-            if (num < first) {
+            if (num <= first) {
                 // We need to update first to be the lowest one even though when we return true
                 // first might not be set to the item which will be used in the triplet
                 // Try [1,0,2,0,-1,3] to see this. The triplet is 0,2,3, but when true is returned
