@@ -1,5 +1,8 @@
 package main;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class main {
 
     public static void main(String[] args) {
@@ -8,8 +11,10 @@ public class main {
         //System.out.println(output[0]);
         //System.out.println(output[1]);
 
-        int[] input = new int[]{1,0,2,0,-1,3};
-        boolean output = increasingTriplet(input);
+        //int[] input = new int[]{1,0,2,0,-1,3};
+        // boolean output = increasingTriplet(input);
+
+        boolean output = isAnagram("anagram", "nagaram");
         System.out.println(output);
     }
 
@@ -68,6 +73,26 @@ public class main {
         }
 
         return false;
+    }
+
+    public static boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) {
+            return false;
+        }
+        HashMap<Character, Integer> sDict = new HashMap<>();
+        HashMap<Character, Integer> tDict = new HashMap<>();
+
+        char[] sArray = s.toCharArray();
+        char[] tArray = t.toCharArray();
+        for (int i = 0; i < sArray.length; i++) {
+            char key1 = sArray[i];
+            sDict.put(key1, sDict.getOrDefault(key1, 0) + 1);
+
+            char key2 = tArray[i];
+            tDict.put(key2, tDict.getOrDefault(key2, 0) + 1);
+        }
+
+        return sDict.equals(tDict);
     }
 
 }
