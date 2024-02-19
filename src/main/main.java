@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,16 @@ public class main {
         //int[] input = new int[]{1,0,2,0,-1,3};
         // boolean output = increasingTriplet(input);
 
-        boolean output = isAnagram("anagram", "nagaram");
+        //boolean output = isAnagram("anagram", "nagaram");
+        //int[] input = new int[]{2,3,1,2,4,3};
+        //int output = minSubArrayLen(7, input);
+
+        //String s = "ADOBECODEBANC";
+        //String t = "ABC";
+        //String output = minWindow(s,t);
+
+        String s = "00110011";
+        int output = countBinarySubstrings(s);
         System.out.println(output);
     }
 
@@ -95,4 +105,106 @@ public class main {
         return sDict.equals(tDict);
     }
 
+    public static int minSubArrayLen(int target, int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int i = 0;
+        int j = 0;
+        int sum = 0;
+        int min = Integer.MAX_VALUE;
+
+        while(j < nums.length) {
+            sum = sum + nums[j++];
+
+            while (sum >= target) {
+                min = Math.min(min, j-i);
+                sum = sum - nums[i++];
+            }
+        }
+
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+
+    public static String minWindow(String s, String t) {
+        HashMap<Character, Integer> tDictionary = new HashMap<>();
+        char[] tChar = t.toCharArray();
+        char[] sChar = s.toCharArray();
+        for (int i = 0; i < tChar.length; i++) {
+            char item = tChar[i];
+            int value = tDictionary.computeIfAbsent(item, (k) -> 0);
+            tDictionary.put(item, ++value);
+        }
+
+        int i = 0;
+        int j = 0;
+        StringBuffer sb = new StringBuffer();
+        int min = Integer.MAX_VALUE;
+
+        while (i < sChar.length) {
+            char atI = sChar[i];
+            if (t.indexOf(atI) > 0) {
+                sb.append(atI);
+                int val = tDictionary.get(atI);
+                tDictionary.put(atI, --val);
+            } else {
+                sb.append(atI);
+            }
+
+            i++;
+        }
+
+        return sb.toString();
+    }
+
+    public static int countBinarySubstringsNotWorked(String s) {
+        int result = 0;
+        char[] sCharArray = s.toCharArray();
+        HashMap<Character, Integer> dictionary = new HashMap<Character, Integer>();
+        dictionary.put('0', 0);
+        dictionary.put('1', 0);
+
+        if (s.length() == 1) {
+            return result;
+        }
+
+        for (int i = 0; i < sCharArray.length; i++) {
+            char item = sCharArray[i];
+            if (item == '0') {
+                int count = dictionary.get('0');
+                dictionary.put('0', ++count);
+            }
+            if (item == '1') {
+                int count = dictionary.get('1');
+                dictionary.put('1', ++count);
+            }
+
+            if (dictionary.get('0') == dictionary.get('1') && dictionary.get('0') != 0) {
+                result++;
+            }
+        }
+        return result;
+    }
+
+    public static int countBinarySubstrings(String s) {
+        int[] groups = new int[s.length()];
+        int t = 0;
+        groups[0] = 1;
+
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i-1) != s.charAt(i)) {
+                groups[++t] = 1;
+            } else {
+                groups[t]++;
+            }
+        }
+
+        int ans = 0;
+        for(int i = 1; i <= t; i++) {
+            ans += Math.min(groups[i-1], groups[i]);
+        }
+
+        return ans;
+    }
 }
