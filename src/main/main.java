@@ -1,8 +1,7 @@
 package main;
 
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import javafx.util.Pair;
 
 public class main {
 
@@ -23,8 +22,16 @@ public class main {
         //String t = "ABC";
         //String output = minWindow(s,t);
 
-        String s = "00110011";
-        int output = countBinarySubstrings(s);
+        //String s = "00110011";
+        //int output = countBinarySubstrings(s);
+        //int[] input = new int[]{-1,0,1,2,-1,-4};
+        //List<List<Integer>> output = threeSum(input);
+
+        //long[] input = new long[]{2L,6L};
+        //long output = getMaxAdditionalDinersCount(10,1, 2, input);
+
+        boolean output = validWordAbbreviation("internationalization", "i12iz4n");
+
         System.out.println(output);
     }
 
@@ -207,4 +214,206 @@ public class main {
 
         return ans;
     }
+
+    public static List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> ans = new ArrayList<>();
+
+        for(int i = 0; i < nums.length - 2; i++) {
+            // Duplicate values has been seen
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            int lo = i + 1;
+            int hi = nums.length - 1;
+
+            while (lo < hi) {
+                int sum = nums[i] + nums[lo] + nums[hi];
+
+                if (sum == 0) {
+                    // Found a triplet with zero sum
+                    ans.add(Arrays.asList(nums[i], nums[lo], nums[hi]));
+
+                    // Duplicate values to be skipped
+                    while (lo < hi && nums[lo] == nums[lo + 1]) {
+                        lo++;
+                    }
+
+                    // Duplicate values to be skipped
+                    while (lo < hi && nums[hi] == nums[hi - 1]) {
+                        hi--;
+                    }
+
+                    // Move both pointers
+                    lo++;
+                    hi--;
+                } else if (sum < 0) {
+                    // Sum is less than zero, increment lo to increase the sum
+                    lo++;
+                } else {
+                    // Sum is greater than zero, decrement k to decrease the sum
+                    hi--;
+                }
+            }
+
+        }
+
+        return ans;
+    }
+
+
+    public static long getMaxAdditionalDinersCount(long N, long K, int M, long[] S) {
+        // Write your code here
+        Arrays.sort(S);
+        long extraSpace = 0L;
+        long firstOpenSeat = 1L;
+
+        for(int i = 0; i < S.length; i++) {
+            long takenSeat = S[i];
+            long openSeat = takenSeat - K - firstOpenSeat;
+            if (openSeat > 0) {
+                extraSpace += Math.ceil((double) openSeat / (K+1L));
+            }
+
+            firstOpenSeat = takenSeat + K + 1;
+        }
+
+        long openSeat = N + 1L - firstOpenSeat;
+        if (openSeat > 0) {
+            extraSpace += Math.ceil((double) openSeat / (K+1L));
+        }
+
+        return extraSpace;
+    }
+
+    public long getSecondsRequired(long N, int F, long[] P) {
+        long min = N;
+        for (int i = 0; i < F; i++) {
+            if (P[i] < min) min = P[i];
+        }
+        return N - min;
+    }
+
+    public static boolean validWordAbbreviation(String word, String abbr) {
+        if (word == null || abbr == null) {
+            throw new IllegalArgumentException("Input is null");
+        }
+
+        int wLen = word.length();
+        int aLen = abbr.length();
+
+        // length of abbreviation cannot be greater than word's length
+        if (aLen > wLen) {
+            return false;
+        }
+
+        if (wLen == 0) {
+            return true;
+        }
+
+        int i = 0;
+        int j = 0;
+
+        while (i < wLen && j < aLen) {
+            // It current characters in both word and abbr is same continue checking.
+            if (word.charAt(i) == abbr.charAt(j)) {
+                i++;
+                j++;
+                continue;
+            }
+
+            // Now current characters in word and abbr do not match. Thus current character
+            // in abbr should be a valid starting digit 0 < x <= 9.
+            if (abbr.charAt(j) == '0' || !Character.isDigit(abbr.charAt(j))) {
+                return false;
+            }
+
+            // The num value
+            int num = 0;
+            while (j < aLen && Character.isDigit(abbr.charAt(j))) {
+                num = 10 * num + (abbr.charAt(j) - '0');
+                j++;
+            }
+
+            // Increment word pinter by num.
+            i += num;
+        }
+
+        // If both i and j pointers are at end, then we have a valid word abbreviation
+        return i == wLen && j == aLen;
+    }
+
+     // Definition for a binary tree node.
+     public class TreeNode {
+      int val;
+      TreeNode left;
+      TreeNode right;
+      TreeNode() {}
+      TreeNode(int val) { this.val = val; }
+         TreeNode(int val, TreeNode left, TreeNode right) {
+          this.val = val;
+          this.left = left;
+          this.right = right;
+      }
+    }
+
+    public class Pair {
+        public Pair(TreeNode treeNode, Integer integer) {
+            this.treeNode = treeNode;
+            this.integer = integer;
+        }
+
+        public TreeNode getTreeNode() {
+            return treeNode;
+        }
+
+        public void setTreeNode(TreeNode treeNode) {
+            this.treeNode = treeNode;
+        }
+
+        TreeNode treeNode;
+        Integer integer;
+    }
+
+    public List<List<Integer>> verticalOrder(TreeNode root) {
+        List<List<Integer>> output = new ArrayList<>();
+        if (root == null) {
+            return output;
+        }
+
+        HashMap<Integer, ArrayList> columnTable = new HashMap<>();
+        Queue<Pair> queue = new ArrayDeque<>();
+        int column = 0;
+        queue.offer(new Pair(root, column));
+
+        while (!queue.isEmpty()) {
+            Pair p = queue.poll();
+            root = p.treeNode;
+            column = p.integer;
+
+            if (root != null) {
+                if (!columnTable.containsKey(column)) {
+                    columnTable.put(column, new ArrayList<Integer>());
+                }
+                columnTable.get(column).add(root.val);
+
+                queue.offer(new Pair(root.left, column - 1));
+                queue.offer(new Pair(root.right, column + 1));
+            }
+        }
+
+        List<Integer> sortedKeys = new ArrayList<>(columnTable.keySet());
+        Collections.sort(sortedKeys);
+        for(int i: sortedKeys) {
+            output.add(columnTable.get(i));
+        }
+
+        return output;
+    }
+
+
+
+
+
 }
