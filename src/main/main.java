@@ -1,7 +1,6 @@
 package main;
 
 import java.util.*;
-import javafx.util.Pair;
 
 public class main {
 
@@ -30,7 +29,14 @@ public class main {
         //long[] input = new long[]{2L,6L};
         //long output = getMaxAdditionalDinersCount(10,1, 2, input);
 
-        boolean output = validWordAbbreviation("internationalization", "i12iz4n");
+        //boolean output = validWordAbbreviation("internationalization", "i12iz4n");
+
+        // String input = "lee(t(c)o)de)"
+        //String input = "a)b(c)d";
+        //String output = minRemoveToMakeValid(input);
+
+        String input = "]]][[[";
+        int output = minSwaps(input);
 
         System.out.println(output);
     }
@@ -412,8 +418,60 @@ public class main {
         return output;
     }
 
+    public static String minRemoveToMakeValid(String s) {
+        Stack<Integer> stack = new Stack<>();
+        StringBuilder sb = new StringBuilder();
+        char[] charArray = s.toCharArray();
+        List<Integer> itemsToRemove = new ArrayList<>();
 
+        for(int i = 0; i < charArray.length; i++) {
+            char item = charArray[i];
 
+            // If we see an opening parenthesis, add it to the stack
+            if (item == '(') {
+                stack.push(i);
+            } else if (item == ')'){
+                // If we see a closing bracket, there needs to be an opening one to make it correct
+                if (stack.size() == 0) {
+                    // error condition
+                    itemsToRemove.add(i);
+                } else {
+                    int openingIndex = stack.pop();
+                }
+            }
+        }
+
+        while(!stack.isEmpty()) {
+            int errorItem = stack.pop();
+            itemsToRemove.add(errorItem);
+        }
+
+        for(int i = 0; i < charArray.length; i++) {
+            if (itemsToRemove.contains(i)) {
+                continue;
+            }
+            sb.append(charArray[i]);
+        }
+        return sb.toString();
+    }
+
+    public static int minSwaps(String s) {
+        Stack <Character> stack = new Stack ();
+        int mismatch = 0;
+        for (int i = 0; i < s.length (); i++) {
+            char ch = s.charAt (i);
+            if (ch == '[')
+                stack.push (ch);
+            else {
+                if (!stack.isEmpty ()) {
+                    stack.pop ();
+                } else {
+                    mismatch++;
+                }
+            }
+        }
+        return (mismatch + 1) / 2;
+    }
 
 
 }
