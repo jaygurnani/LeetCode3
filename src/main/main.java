@@ -35,8 +35,11 @@ public class main {
         //String input = "a)b(c)d";
         //String output = minRemoveToMakeValid(input);
 
-        String input = "]]][[[";
-        int output = minSwaps(input);
+        //String input = "]]][[[";
+        //int output = minSwaps(input);
+
+        int[] input = new int[]{2,2,2,1,2,2,1,2,2,2};
+        int output = numberOfSubarrays2(input, 2);
 
         System.out.println(output);
     }
@@ -129,11 +132,14 @@ public class main {
         int min = Integer.MAX_VALUE;
 
         while(j < nums.length) {
-            sum = sum + nums[j++];
+            sum = sum + nums[j];
+            j++;
 
             while (sum >= target) {
                 min = Math.min(min, j-i);
-                sum = sum - nums[i++];
+
+                sum = sum - nums[i];
+                i++;
             }
         }
 
@@ -267,7 +273,6 @@ public class main {
 
         return ans;
     }
-
 
     public static long getMaxAdditionalDinersCount(long N, long K, int M, long[] S) {
         // Write your code here
@@ -473,5 +478,70 @@ public class main {
         return (mismatch + 1) / 2;
     }
 
+    // Using 2 pointers
+    public static int numberOfSubarrays(int[] nums, int k) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int subArrayCount = 0;
+        int oddCount = 0;
+        int i = 0;
+        int j = 0;
+
+        while (i < nums.length) {
+            if (nums[i] % 2 == 1) {
+                oddCount++;
+            }
+
+
+            while (oddCount == k) {
+                subArrayCount++;
+                if (nums[j] % 2 == 1) {
+                    oddCount--;
+                }
+                j++;
+            }
+            i++;
+
+        }
+
+        return subArrayCount;
+
+    }
+
+    // Using prefix sum
+    public static int numberOfSubarrays2(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        map.put(0,1);
+        int totalFound = 0;
+        int prefixSum = 0;
+
+        for(int i = 0; i < nums.length; i++) {
+            int item = nums[i];
+            int value = 0;
+            if (item % 2 == 1) {
+                value = 1;
+            }
+
+            prefixSum = prefixSum + value;
+            int diff = prefixSum - k;
+            if (map.containsKey(diff)) {
+                int current = map.get(diff);
+                totalFound = totalFound + current;
+            }
+
+            if (map.containsKey(prefixSum)) {
+                int prefixSumCurrent = map.get(prefixSum);
+                map.put(prefixSum, ++prefixSumCurrent);
+            } else {
+                map.put(prefixSum, 1);
+            }
+
+        }
+
+        return totalFound;
+
+    }
 
 }
