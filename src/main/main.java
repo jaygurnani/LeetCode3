@@ -1,6 +1,7 @@
 package main;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class main {
 
@@ -38,8 +39,23 @@ public class main {
         //String input = "]]][[[";
         //int output = minSwaps(input);
 
-        int[] input = new int[]{2,2,2,1,2,2,1,2,2,2};
-        int output = numberOfSubarrays2(input, 2);
+        //int[] input = new int[]{2,2,2,1,2,2,1,2,2,2};
+        //int output = numberOfSubarrays2(input, 2);
+
+        //String[] words = new String[]{"cat","bt","hat","tree"};
+        //String chars = "atach";
+        //int output = countCharacters(words, chars);
+
+        //String[] cpdomains = new String[] {"9001 discuss.leetcode.com"};
+        //List<String> output = subdomainVisits(cpdomains);
+
+        //char[][] board = {{'A','B','C','E'},{'S','F','C','S'},{'A','D','E','E'}};
+        //String word = "ABCCED";
+        //boolean output = exist(board, word);
+
+        int[] nums1 = {3,9,9,2,1};
+        int[] nums2 = {3,2,1,4,7};
+        int output = findLength(nums1, nums2);
 
         System.out.println(output);
     }
@@ -544,4 +560,189 @@ public class main {
 
     }
 
+    // First attempt but too complex
+    public static int countCharactersFirstAttempt(String[] words, String chars) {
+        int totalCounter = 0;
+
+        // First we build up a hashmap of the chars String
+        HashMap<Character, Integer> charsDictionary = new HashMap();
+        char[] charsArray = chars.toCharArray();
+        for(int i = 0; i < chars.length(); i++) {
+            char item = charsArray[i];
+            int value = charsDictionary.computeIfAbsent(item, (s) -> 0);
+            charsDictionary.put(item, ++value);
+        }
+
+        // Next we see if we can make the item from the chars array
+        for(int j = 0; j < words.length; j++) {
+            StringBuffer sb = new StringBuffer();
+            String word = words[j];
+            char[] wordArray = word.toCharArray();
+
+            for(int k = 0; k < wordArray.length; k++) {
+                char toCheck = wordArray[k];
+                if (charsDictionary.containsKey(toCheck)) {
+                    int toCheckValue = charsDictionary.get(toCheck);
+                    if (toCheckValue == 0) {
+                        sb = new StringBuffer();
+                        break;
+                    }
+                    sb.append(toCheck);
+                    charsDictionary.put(toCheck, --toCheckValue);
+                } else {
+                    sb = new StringBuffer();
+                    break;
+                }
+            }
+
+            // If we reach here, we have found a match, we need to add it back to the counter
+            String sbString = sb.toString();
+            totalCounter = totalCounter + sbString.length();
+
+            // Now we need to add the item back
+            char[] sbStringArray = sbString.toCharArray();
+            for(int i = 0; i < sbStringArray.length; i++) {
+                char item = sbStringArray[i];
+                int value = charsDictionary.computeIfAbsent(item, (s) -> 0);
+                charsDictionary.put(item, ++value);
+            }
+        }
+
+
+        return totalCounter;
+
+    }
+
+    // Second attempt by creating 2 hashmaps instead of one
+    public static int countCharacters(String[] words, String chars) {
+       int totalCount = 0;
+
+        Map<Character, Integer> charCount = new HashMap<Character, Integer>();
+        for(Character c: chars.toCharArray()) {
+            charCount.put(c, charCount.getOrDefault(c, 0) + 1);
+        }
+
+        for(String word: words) {
+            Map<Character, Integer> wordCount = new HashMap<Character, Integer>();
+
+            for(Character c: word.toCharArray()) {
+                wordCount.put(c, wordCount.getOrDefault(c, 0) + 1);
+            }
+
+            boolean goodValue = true;
+            for(Character c: wordCount.keySet()) {
+                if (charCount.getOrDefault(c, 0) < wordCount.get(c)) {
+                    goodValue = false;
+                    break;
+                }
+            }
+
+            if (goodValue) {
+                totalCount = totalCount + word.length();
+            }
+
+        }
+
+        return totalCount;
+    }
+
+    public static List<String> subdomainVisits(String[] cpdomains) {
+        // First we need to take each domain and the split it up by the space character
+        // Then we add it to the hashmap of subdomains split by "." character
+
+        Map<String, Integer> map = new HashMap<>();
+
+        for(String s: cpdomains) {
+            String[] cpDomain = s.split("\s");
+
+            int count = Integer.parseInt(cpDomain[0]);
+            String[] domain = cpDomain[1].split("\\.");
+
+            StringBuilder sb = new StringBuilder();
+            for(int i = domain.length - 1; i >= 0; i--) {
+                String domainString = domain[i];
+
+                sb.insert(0, domainString);
+                map.put(sb.toString(), map.getOrDefault(sb.toString(), 0) + count);
+
+                sb.insert(0, ".");
+            }
+        }
+
+        List<String> output =  map.keySet().stream()
+                .map(key -> map.get(key) + " " + key)
+                .collect(Collectors.toList());
+        return output;
+
+    }
+
+    // Nah fuck this one. You gotta backtrack instead of DFS
+    public static boolean exist(char[][] board, String word) {
+        // first we need to find our first character then perform dfs
+        // also need to keep track of visited
+
+        boolean found = false;
+        int boardX = board.length;
+        int boardY = board[0].length;
+        char[] wordArray = word.toCharArray();
+        Stack<int[]> stack = new Stack<>();
+        boolean[][] visited = new boolean[boardX][boardY];
+        int[][] directions = new int[][]{{0,1}, {0,-1}, {-1,0}, {1,0}};
+
+        // Add the first character to visit
+        stack.add(new int[]{0,0});
+        int currentWordCount = 0;
+
+
+
+        while(!stack.isEmpty()) {
+            int[] item = stack.pop();
+            int x = item[0];
+            int y = item[1];
+            Character toCheck = board[x][y];
+            if (visited[x][y]) {
+                continue;
+            }
+            visited[x][y] = true;
+
+            if (wordArray[currentWordCount] == toCheck) {
+                currentWordCount++;
+                for(int[] direction: directions) {
+                    int newX = x + direction[0];
+                    int newY = y + direction[1];
+                    if (newX >= boardX || newX < 0 || newY >= boardY || newY < 0) {
+                        continue;
+                    } else {
+                        stack.add(new int[]{newX, newY});
+                    }
+                }
+            }
+
+            if (currentWordCount == wordArray.length) {
+                return true;
+            }
+
+        }
+
+        return found;
+
+    }
+
+    public static int findLength(int[] nums1, int[] nums2) {
+        int nums1Length = nums1.length;
+        int nums2Length = nums2.length;
+        int[][] dp = new int[nums1Length + 1][nums2Length+1];
+        int max = 0;
+
+        for(int i = 1; i < dp.length; i++) {
+            for(int j = 1; j < dp[0].length; j++) {
+                if (nums1[i-1] == nums2[j-1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1 ;
+                    max = Math.max(max, dp[i][j]);
+                }
+            }
+        }
+
+        return max;
+    }
 }
