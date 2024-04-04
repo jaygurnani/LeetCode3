@@ -673,7 +673,6 @@ public class main {
                 .map(key -> map.get(key) + " " + key)
                 .collect(Collectors.toList());
         return output;
-
     }
 
     // Nah fuck this one. You gotta backtrack instead of DFS
@@ -744,5 +743,78 @@ public class main {
         }
 
         return max;
+    }
+
+    public static boolean isValidSudoku(char[][] board) {
+        // First we need a hashset of all the rows and columns
+        // This is the board size
+        int N = 9;
+
+        HashSet<Character>[] rows = new HashSet[N];
+        HashSet<Character>[] columns = new HashSet[N];
+        HashSet<Character>[] boxes = new HashSet[N];
+
+        for(int r = 0; r < N; r++) {
+            rows[r] = new HashSet<Character>();
+            columns[r] = new HashSet<Character>();
+            boxes[r] = new HashSet<Character>();
+        }
+
+        for(int r = 0; r < N; r++) {
+            for(int c = 0; c < N; c++){
+                char val = board[r][c];
+
+                if (val == '.') {
+                    continue;
+                }
+                if (rows[r].contains(val)) {
+                    return false;
+                }
+                rows[r].add(val);
+
+                if (columns[c].contains(val)) {
+                    return false;
+                }
+                columns[c].add(val);
+
+                int idx = (r / 3) * 3 + c / 3;
+                if (boxes[idx].contains(val)) {
+                    return false;
+                }
+                boxes[idx].add(val);
+            }
+        }
+
+        return true;
+    }
+
+    public List<String> alertNames(String[] keyName, String[] keyTime) {
+        Map<String, List<Integer>> map = new HashMap<>();
+        List<String> res = new ArrayList<>();
+        for(int i = 0; i < keyName.length; i++) {
+            String k = keyName[i];
+            int timeInMinutes = getTime(keyTime[i]);
+            map.computeIfAbsent(k, g -> new ArrayList<>());
+            map.get(k).add(timeInMinutes);
+        }
+
+        for(String k: map.keySet()) {
+            List<Integer> l = map.get(k);
+            Collections.sort(l);  // sort to find the connective checkins
+            for (int i = 2; i < l.size(); i++)
+                if (l.get(i) - l.get(i - 2) <= 60) {  // connective 3 within 60 mins.
+                    res.add(k);
+                    break;
+                }
+        }
+
+
+        Collections.sort(res);
+        return res;
+    }
+
+    private int getTime(String t) {
+        String[] ss = t.split(":");
+        return Integer.parseInt(ss[1]) + 60 * Integer.parseInt(ss[0]);
     }
 }
