@@ -53,9 +53,14 @@ public class main {
         //String word = "ABCCED";
         //boolean output = exist(board, word);
 
-        int[] nums1 = {3,9,9,2,1};
-        int[] nums2 = {3,2,1,4,7};
-        int output = findLength(nums1, nums2);
+        //int[] nums1 = {3,9,9,2,1};
+        //int[] nums2 = {3,2,1,4,7};
+        //int output = findLength(nums1, nums2);
+
+        //boolean output = isPalindrome(121);
+
+        String[] input = new String[]{"cir","car"};
+        String output = longestCommonPrefix(input);
 
         System.out.println(output);
     }
@@ -817,4 +822,86 @@ public class main {
         String[] ss = t.split(":");
         return Integer.parseInt(ss[1]) + 60 * Integer.parseInt(ss[0]);
     }
+
+    public boolean checkValid(int[][] m) {
+        Set<String> set = new HashSet<>();
+
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < m.length; j++) {
+                if (!set.add(m[i][j] + "r" + i) || !set.add(m[i][j] + "c" + j)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isPalindrome(int x) {
+        char[] xArray = String.valueOf(x).toCharArray();
+        int i = 0;
+        int j = xArray.length-1;
+
+        while (i < j) {
+            char iItem = xArray[i];
+            char jItem = xArray[j];
+            if (iItem != jItem) {
+                return false;
+            }
+
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    public static int romanToInt(String s) {
+        Map<Character, Integer> m = new HashMap<>();
+
+        m.put('I', 1);
+        m.put('V', 5);
+        m.put('X', 10);
+        m.put('L', 50);
+        m.put('C', 100);
+        m.put('D', 500);
+        m.put('M', 1000);
+
+        int ans = 0;
+
+        for(int i = 0; i < s.length(); i++) {
+            if (i < s.length() - 1 && m.get(s.charAt(i)) < m.get(s.charAt(i+1))) {
+                ans = ans - m.get(s.charAt(i));
+            } else {
+                ans = ans + m.get(s.charAt(i));
+            }
+
+        }
+
+        return ans;
+    }
+
+    public static String longestCommonPrefix(String[] strs) {
+        if (strs.length == 0) {
+            return "";
+        }
+
+        char[] currentLongest = strs[0].toCharArray();
+        for(int i = 1; i < strs.length; i++) {
+            char[] word = strs[i].toCharArray();
+
+            StringBuilder sb = new StringBuilder();
+            for(int j = 0; j < word.length; j++) {
+                if (j < currentLongest.length && currentLongest[j] == word[j]) {
+                    sb.append(currentLongest[j]);
+                } else {
+                    break;
+                }
+            }
+
+            currentLongest = sb.toString().toCharArray();
+        }
+
+        return new String(currentLongest);
+    }
+
 }
